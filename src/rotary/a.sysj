@@ -1,0 +1,146 @@
+rotary(
+		input signal tableAlignedWithSensor, bottleAtPos5, capOnBottleAtPos1,GUITrigger;
+		output signal rotaryTableTrigger;
+		input boolean channel fillerReady, capperReady, convReady, baxterReady;
+		input boolean channel dec,inc,requestCap;
+		output boolean channel rotated, incomingBaxter;
+		)
+->
+{
+	long signal notEmpty;
+	signal placeCapOK, placeCap, rotateDone;
+	int signal bCount;
+
+	emit bCount(0);
+	pause;
+	{receive fillerReady;} || {receive capperReady;} || {receive convReady;} || {receive baxterReady;}
+
+	{
+		System.out.println("starting");
+		loop{
+			abort(GUITrigger){
+				trap(T){
+					loop{
+							await(notEmpty);
+
+							if(#fillerReady && #capperReady && #convReady && #baxterReady){
+								exit(T);
+							}
+							pause;
+					}
+				}
+
+				present(bottleAtPos5) {
+					waitl(1s);
+					await(!bottleAtPos5);
+				}
+
+				trap(T){{waitl(100ms); exit(T);} || { sustain rotaryTableTrigger;}}
+
+				await(tableAlignedWithSensor);
+				System.out.println("aligned");
+
+				// Let the baxter arm knows that a bottle is entering to the slot
+				present(placeCap) {
+					emit placeCapOK;	
+					send incomingBaxter(true);
+				}
+
+				emit rotateDone;
+				pause; // delayed
+				pause; // wait until notempty is cleared
+
+				trap(T){{waitl(3s); exit(T);} || { send rotated(true); halt; }}
+				do{ System.out.println("expired");}
+				pause;
+			} do {
+				trap(T){{waitl(100ms); exit(T);} || {sustain rotaryTableTrigger;}}
+			}
+		}
+	}
+	||
+	{
+		loop{
+			receive requestCap;
+			System.out.println("requestCap");
+			abort(immediate placeCapOK){sustain placeCap;}
+			System.out.println("placeCapOK");
+			pause;
+		}
+	}
+	||
+	{
+		{
+			loop{
+				receive fillerReady;
+				pause;
+			}
+		}
+		||
+		{
+			loop{
+				receive capperReady;
+				pause;
+			}
+		}
+		||
+		{
+			loop{
+				receive convReady;
+				pause;
+			}
+		}
+		||
+		{
+			loop{
+				receive baxterReady;
+				pause;
+			}
+		}
+	}
+	||
+	{
+		{
+			int rCount = 0;
+			loop{
+				present(bCount) {
+					rCount = 0;
+				} else present(rotateDone) {
+					rCount++;
+					System.out.println("rcount : "+rCount);
+				} 
+
+				if(rCount > 5) {
+					emit bCount(0);
+					rCount = 0;
+					System.out.println("bCount reset");
+				} else if((Integer)#bCount > 0){
+					emit notEmpty;
+				}
+				pause;
+			}
+		}
+		||
+		{
+			loop{
+				receive inc;
+				emit bCount((Integer)#bCount+1);
+				System.out.println("# bottles : "+((Integer)#bCount + 1));
+				pause;
+			}
+		}
+		||
+		{
+			loop{
+				receive dec;
+				if((Integer)#bCount > 0){
+					emit bCount((Integer)#bCount-1);
+					System.out.println("# bottles : "+((Integer)#bCount - 1));
+				} else {
+					System.out.println("# bottles : "+#bCount);
+				}
+				pause;
+			}
+		}
+	}
+}

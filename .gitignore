@@ -1,0 +1,5 @@
+*.swp
+bin
+*.class
+*.*~
+webserver/node_modules

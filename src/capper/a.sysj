@@ -1,0 +1,40 @@
+Capper(
+		input signal bottleAtPos4, gripperXAxisLowered,gripperXAxisLifted,gripperTurnHomePos,gripperTurnFinalPos;
+		output signal cylPos5XaxisExtend,gripperTurnRetract,gripperTurnExtend,capGripperPos5Extend,cylClampBottleExtend;
+		output boolean channel capperReady;
+		)
+->
+{
+	send capperReady(true);
+
+	loop{
+		await(bottleAtPos4);
+
+		send capperReady(false);
+
+		abort(gripperXAxisLifted){halt;}
+		abort(gripperTurnHomePos){sustain gripperTurnRetract;}
+		trap(T){
+			{sustain cylPos5XaxisExtend;}
+			||
+			{
+				await(gripperXAxisLowered);
+
+				{sustain capGripperPos5Extend;}
+				||	
+				{sustain gripperTurnExtend;}
+				||
+				{
+					await(gripperTurnFinalPos);
+					exit(T);
+				}
+			}
+		}
+		await(gripperXAxisLifted);
+
+		send capperReady(true);
+		await(!bottleAtPos4);
+	}	
+
+}
+

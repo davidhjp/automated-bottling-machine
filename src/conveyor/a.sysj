@@ -1,0 +1,51 @@
+Conveyor(
+		input signal bottleAtPos1;
+		input signal bottleLeftPos5;
+		output signal motConveyorOnOff;
+		input boolean channel rotated;
+		output boolean channel convReady,inc,dec;
+		)
+->
+{
+	signal bottlePos5Clear;
+
+	{
+		send convReady(true);
+		{
+			loop{
+				await(bottleAtPos1);
+				System.out.println("detected a bottle");
+				send convReady(false);
+
+				waitl(2s);
+
+				send inc(true);
+				System.out.println("inc");
+				pause;
+				await(bottlePos5Clear);
+				pause;
+				send convReady(true);
+				pause;
+				receive rotated;
+				pause;
+				waitl(3s);
+			}
+		}
+		||
+		{
+			loop{
+				abort(bottleLeftPos5){
+					sustain bottlePos5Clear;
+				}
+				send dec(true);
+				waitl(3s);
+			}
+		}
+		||
+		{
+			sustain motConveyorOnOff;
+		}
+	}
+}
+
+

@@ -1,0 +1,16 @@
+{
+  "name": "abm-server",
+  "version": "1.0.0",
+  "description": "ABM Webserver",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "HJPark",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "express": "^4.15.2",
+    "jquery": "^3.2.1"
+  }
+}

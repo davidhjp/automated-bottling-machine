@@ -1,0 +1,44 @@
+filler(
+		input signal bottleAtPos2,dosUnitEvac,dosUnitFilled;
+		output signal valveInjectorOnOff, valveInletOnOff, dosUnitValveRetract, dosUnitValveExtend ;
+		output boolean channel fillerReady,requestCap;
+		)
+->
+{
+
+	send fillerReady(true);
+
+	loop{
+		await(bottleAtPos2);
+
+		send fillerReady(false);
+
+		abort(dosUnitFilled){
+			{
+				sustain valveInjectorOnOff;
+			}
+			||
+			{
+				sustain dosUnitValveRetract;
+			}
+		}
+
+		abort(dosUnitEvac){
+			{
+				sustain valveInletOnOff;
+			}
+			||
+			{
+				sustain dosUnitValveExtend;
+			}
+		}
+
+		// Let the rotary know that a cap neeeds to be placed in the next turn
+		send requestCap(true);
+		pause;
+
+		send fillerReady(true);
+
+		await(!bottleAtPos2);
+	}
+}

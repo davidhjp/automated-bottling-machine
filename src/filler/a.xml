@@ -1,0 +1,31 @@
+<System xmlns="http://systemjtechnology.com">
+	<Interconnection>
+		<Link Type="Destination">
+			<Interface SubSystem="ConveyorSS" Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.101:4000"/>
+			<Interface SubSystem="FillerSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.102:4000"/>
+			<Interface SubSystem="RotarySS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.103:4000"/>
+			<Interface SubSystem="CapperSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.104:4000"/>
+		</Link>
+	</Interconnection>
+
+	<SubSystem Name="FillerSS" Local="true">		
+		<ClockDomain Name="FillerCD" Class="filler">
+			<iSignal Name="bottleAtPos2"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="3" /> <!--1 -->
+			<iSignal Name="dosUnitEvac"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="2" />	<!--0 -->
+			<iSignal Name="dosUnitFilled"  	Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="5" /> <!--3 -->
+
+			<oSignal Name="valveInjectorOnOff"  	Class="com.systemj.ipc.SignalGPIO_1Out" Index="32"/> <!--3  (output header) -->
+			<oSignal Name="valveInletOnOff"		Class="com.systemj.ipc.SignalGPIO_1Out" Index="16"/> <!-- 2  (output header) -->
+			<oSignal Name="dosUnitValveRetract" Class="com.systemj.ipc.SignalGPIO_1Out" Index="8"/> <!-- 1 (output header) -->
+			<oSignal Name="dosUnitValveExtend" 	Class="com.systemj.ipc.SignalGPIO_1Out" Index="4"/> <!--  0(output header) -->
+			<oChannel Name="fillerReady"     To="RotaryCD.fillerReady" />
+			<oChannel Name="requestCap"     To="RotaryCD.requestCap" />
+		</ClockDomain>	
+	</SubSystem>
+	<SubSystem Name="RotarySS">	
+		<ClockDomain Name="RotaryCD" Class="rotary">
+			<iChannel Name="fillerReady"     From="FillerCD.fillerReady" />
+			<iChannel Name="requestCap"     From="FillerCD.requestCap" />
+		</ClockDomain>
+	</SubSystem>
+</System>

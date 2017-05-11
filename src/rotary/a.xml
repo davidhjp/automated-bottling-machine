@@ -1,0 +1,63 @@
+<System xmlns="http://systemjtechnology.com">
+	<Interconnection>
+		<Link Type="Destination">
+			<Interface SubSystem="ConveyorSS" Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.101:4000"/>
+			<Interface SubSystem="FillerSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.102:4000"/>
+			<Interface SubSystem="RotarySS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.103:4000"/>
+			<Interface SubSystem="CapperSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.104:4000"/>
+			<Interface SubSystem="BaxterSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.124:4000"/>
+		</Link>
+	</Interconnection>
+
+	<SubSystem Name="RotarySS" Local="true">	
+		<ClockDomain Name="RotaryCD" Class="rotary">
+			<iSignal Name="tableAlignedWithSensor"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="3" />	<!-- 1 -->
+			<iSignal Name="GUITrigger"  Class="com.systemj.ipc.StringServer" IP="192.168.1.103" Port="1010" />	<!-- 1 -->
+			<iSignal Name="bottleAtPos5"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="5" />	<!-- 3 -->			
+			<iSignal Name="capOnBottleAtPos1"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="7" />	<!-- 5 -->			
+			<oSignal Name="rotaryTableTrigger" Class="com.systemj.ipc.SignalGPIO_1Out" Index="8"/> <!-- -->
+			<oChannel Name="rotated"     To="ConveyorCD.rotated" />				
+			<oChannel Name="incomingBaxter"  To="BaxterCD.incomingBaxter" />				
+			<iChannel Name="convReady"     From="ConveyorCD.convReady" />
+			<iChannel Name="capperReady"     From="CapperCD.capperReady" />
+			<iChannel Name="fillerReady"     From="FillerCD.fillerReady" />
+			<iChannel Name="baxterReady"     From="BaxterCD.baxterReady" />
+			<iChannel Name="inc"     From="ConveyorCD.inc" />
+			<iChannel Name="dec"     From="ConveyorCD.dec" />
+			<iChannel Name="requestCap"     From="FillerCD.requestCap" />
+		</ClockDomain>
+	</SubSystem>
+
+	<SubSystem Name="BaxterSS" >	
+		<ClockDomain Name="BaxterCD" Class="Baxter">
+			<oChannel Name="capperReady"     To="RotaryCD.baxterReady" />
+			<iChannel Name="incomingBaxter"  From="RotaryCD.incomingBaxter" />
+		</ClockDomain>
+	</SubSystem>
+
+	<SubSystem Name="CapperSS" >	
+		<ClockDomain Name="CapperCD" Class="Capper">
+			<oChannel Name="capperReady"     To="RotaryCD.capperReady" />
+		</ClockDomain>
+	</SubSystem>
+
+	<SubSystem Name="FillerSS" >		
+		<ClockDomain Name="FillerCD" Class="filler">
+			<oChannel Name="fillerReady"     To="RotaryCD.fillerReady" />
+			<oChannel Name="requestCap"     To="RotaryCD.requestCap" />
+		</ClockDomain>	
+	</SubSystem>
+
+	<SubSystem Name="ConveyorSS" >		
+		<ClockDomain Name="ConveyorCD" Class="Conveyor">
+			<iSignal Name="bottleAtPos1" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="2" />	<!-- 0 -->			
+			<iSignal Name="bottleLeftPos5"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="4" />	<!-- 2 -->			
+			<oSignal Name="motConveyorOnOff" Class="com.systemj.ipc.SignalGPIO_1Out" Index="4"/> <!-- -->	
+			<iChannel Name="rotated"     From="RotaryCD.rotated" />				
+			<oChannel Name="convReady"     To="RotaryCD.convReady" />
+			<oChannel Name="inc"     To="RotaryCD.inc" />
+			<oChannel Name="dec"     To="RotaryCD.dec" />
+		</ClockDomain>	
+	</SubSystem>
+
+</System>

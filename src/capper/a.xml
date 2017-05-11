@@ -1,0 +1,35 @@
+<System xmlns="http://systemjtechnology.com">
+	<Interconnection>
+		<Link Type="Destination">
+			<Interface SubSystem="ConveyorSS" Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.101:4000"/>
+			<Interface SubSystem="FillerSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.102:4000"/>
+			<Interface SubSystem="RotarySS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.103:4000"/>
+			<Interface SubSystem="CapperSS"   Class="com.systemj.ipc.TCPIPInterface" Args="192.168.1.104:4000"/>
+		</Link>
+	</Interconnection>
+
+	<SubSystem Name="RotarySS">	
+		<ClockDomain Name="RotaryCD" Class="rotary">
+			<iChannel Name="capperReady"     From="CapperCD.capperReady" />
+			<iChannel Name="requestCap"     From="CapperCD.requestCap" />
+		</ClockDomain>
+	</SubSystem>
+
+	<SubSystem Name="CapperSS" Local="true">	
+		<ClockDomain Name="CapperCD" Class="Capper">
+			<iSignal Name="bottleAtPos4" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="3" />
+			<iSignal Name="gripperXAxisLowered" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="2" />	<!-- 0 (de1 input header), translate by 2 for cape -->
+			<iSignal Name="gripperXAxisLifted" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="5" />	<!-- 3 -->			
+			<iSignal Name="gripperTurnHomePos" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="4" />	<!-- 2 -->
+			<iSignal Name="gripperTurnFinalPos" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="7" />	 <!--5 -->						
+			<oSignal Name="cylPos5XaxisExtend" Class="com.systemj.ipc.SignalGPIO_1Out" Index="8"/> <!-- 1 (output header) -->
+			<oSignal Name="gripperTurnRetract" Class="com.systemj.ipc.SignalGPIO_1Out" Index="4"/>   <!-- 0 -->
+			<oSignal Name="gripperTurnExtend" Class="com.systemj.ipc.SignalGPIO_1Out" Index="32"/>	<!-- 3 -->
+			<oSignal Name="capGripperPos5Extend" Class="com.systemj.ipc.SignalGPIO_1Out" Index="16"/>	<!-- 2 -->
+			<oSignal Name="cylClampBottleExtend" Class="com.systemj.ipc.SignalGPIO_1Out" Index="128"/>	<!-- 5 -->
+
+			<oChannel Name="capperReady"     To="RotaryCD.capperReady" />
+		</ClockDomain>
+	</SubSystem>
+
+</System>
