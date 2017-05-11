@@ -40,7 +40,6 @@ endif
 	find src -type f \( -iname '*.java' -o -iname '*.class' \) -exec rm -rf {} \;
 	rm -rf gpio/com/systemj/ipc/*.class
 	rm -rf GUI/*.class
-	rm -rf systemj
 
 init:
 ifeq ($(REMOTE),true)
@@ -83,7 +82,7 @@ endif
 
 
 build_all: $(CV_DIR)/Conveyor.class $(F_DIR)/filler.class $(R_DIR)/rotary.class $(CP_DIR)/Capper.class \
-					 bin/Baxter.class
+					 $(B_DIR)/Baxter.class
 
 $(CV_DIR)/Conveyor.class: $(CV_DIR)/$(SYSJ)
 	$(BIN)/sysjc -d $(CV_DIR) --silence $(CV_DIR)/$(SYSJ)
@@ -109,7 +108,7 @@ ifeq ($(REMOTE),true)
 	scp -r $(CP_DIR)/* $(CP):~/$(BASE)
 endif
 
-bin/Baxter.class: $(B_DIR)/$(SYSJ)
+$(B_DIR)/Baxter.class: $(B_DIR)/$(SYSJ)
 	$(BIN)/sysjc --silence -d $(B_DIR) $(B_DIR)/a.sysj
 
 
