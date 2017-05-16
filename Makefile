@@ -18,13 +18,13 @@ SYSJ_DIR=systemj
 BIN=$(SYSJ_DIR)/sjdk/bin
 LIB=$(SYSJ_DIR)/sjdk/lib
 TOOLS=$(BIN) $(LIB)
-SJDK_RELEASE=https://github.com/hjparker/systemj-release/releases/download/2.1-113/sjdk-v2.1-113-ga85cf96.zip
+SJDK_RELEASE=https://github.com/hjparker/systemj-release/releases/download/v2.1-116/sjdk-v2.1-116-g137cb0d.tgz
 
 all: systemj/sjdk init build_all run
 
 systemj/sjdk:
 	-mkdir $(SYSJ_DIR)
-	cd $(SYSJ_DIR); wget $(SJDK_RELEASE); unzip sjdk*.zip; mv sjdk*/ sjdk
+	cd $(SYSJ_DIR); wget $(SJDK_RELEASE); tar xvaf sjdk*.tgz; mv sjdk*/ sjdk
 	chmod 777 $(BIN)/* $(LIB)/*
 	javac -cp $(LIB)/\* gpio/com/systemj/ipc/*.java
 	cd gpio; jar uvf ../$(LIB)/sjrt*-desktop.jar com/systemj/ipc/*.class
