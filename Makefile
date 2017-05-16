@@ -18,7 +18,7 @@ SYSJ_DIR=systemj
 BIN=$(SYSJ_DIR)/sjdk/bin
 LIB=$(SYSJ_DIR)/sjdk/lib
 TOOLS=$(BIN) $(LIB)
-SJDK_RELEASE=https://github.com/hjparker/systemj-release/releases/download/v2.1-116/sjdk-v2.1-116-g137cb0d.tgz
+SJDK_RELEASE=https://github.com/hjparker/systemj-release/releases/download/v2.1-120/sjdk-v2.1-120-g6b0e63e.tgz
 
 all: systemj/sjdk init build_all run
 
