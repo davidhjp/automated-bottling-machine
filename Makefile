@@ -60,7 +60,7 @@ ifeq ($(OS),Windows_NT)
 	mintty --size=40,10 -p 400,0 -T filler -e ssh $(F) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml; read -p 'done'\""  & disown
 	mintty --size=40,10 -p 800,0 -T rotary -e ssh $(R) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml; read -p 'done'\""  & disown
 	mintty --size=40,10 -p 0,500 -T capper -e ssh $(CP) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml; read -p 'done'\"" & disown
-	mintty --size=40,10 -p 400,500 -T baxter -e bash -c "cd $(B_DIR); sysjr a.xml; read -p 'done'"  & disown
+#    mintty --size=40,10 -p 400,500 -T baxter -e bash -c "cd $(B_DIR); sysjr a.xml; read -p 'done'"  & disown
 	cd webserver ; make
 else
 	$(error Need to implement deployment method for $(shell uname -s))
