@@ -2,43 +2,30 @@ Conveyor(
 		input signal bottleAtPos1;
 		input signal bottleLeftPos5;
 		output signal motConveyorOnOff;
-		input boolean channel rotated;
-		output boolean channel convReady,inc,dec;
+		output boolean channel convReady, conv_detect;
+		input boolean channel trig_conveyor;
 		)
 ->
 {
-	signal bottlePos5Clear;
-
 	{
-		send convReady(true);
 		{
 			loop{
-				await(bottleAtPos1);
+				receive trig_conveyor;
 				System.out.println("detected a bottle");
-				send convReady(false);
-
-				waitl(2s);
-
-				send inc(true);
-				System.out.println("inc");
 				pause;
-				await(bottlePos5Clear);
-				pause;
-				send convReady(true);
-				pause;
-				receive rotated;
-				pause;
-				waitl(3s);
+				trap(T){{send convReady(true);}||{waitl(3s); exit(T);}}
 			}
 		}
 		||
 		{
-			loop{
-				abort(bottleLeftPos5){
-					sustain bottlePos5Clear;
+			loop {
+				boolean b = false;
+				present(bottleAtPos1){
+					b = true;
 				}
-				send dec(true);
-				waitl(3s);
+				send conv_detect(b);
+				waitl(50 ms);
+				pause;
 			}
 		}
 		||

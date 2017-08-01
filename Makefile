@@ -81,8 +81,8 @@ else
 endif
 
 
-build_all: $(CV_DIR)/Conveyor.class $(F_DIR)/filler.class $(R_DIR)/rotary.class $(CP_DIR)/Capper.class \
-					 $(B_DIR)/Baxter.class
+build_all: $(CV_DIR)/Conveyor.class $(F_DIR)/filler.class $(R_DIR)/rotary.class $(CP_DIR)/Capper.class # \
+#             $(B_DIR)/Baxter.class
 
 $(CV_DIR)/Conveyor.class: $(CV_DIR)/$(SYSJ)
 	$(BIN)/sysjc -d $(CV_DIR) --silence $(CV_DIR)/$(SYSJ)
@@ -108,8 +108,8 @@ ifeq ($(REMOTE),true)
 	scp -r $(CP_DIR)/* $(CP):~/$(BASE)
 endif
 
-$(B_DIR)/Baxter.class: $(B_DIR)/$(SYSJ)
-	$(BIN)/sysjc --silence -d $(B_DIR) $(B_DIR)/a.sysj
+#  $(B_DIR)/Baxter.class: $(B_DIR)/$(SYSJ)
+#    $(BIN)/sysjc --silence -d $(B_DIR) $(B_DIR)/a.sysj
 
 
 

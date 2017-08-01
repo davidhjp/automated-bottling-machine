@@ -12,6 +12,8 @@
 		<ClockDomain Name="RotaryCD" Class="rotary">
 			<iChannel Name="capperReady"     From="CapperCD.capperReady" />
 			<iChannel Name="requestCap"     From="CapperCD.requestCap" />
+			<iChannel Name="capper_detect"     From="CapperCD.capper_detect" />
+			<oChannel Name="trig_capper"     To="CapperCD.trig_capper" />
 		</ClockDomain>
 	</SubSystem>
 
@@ -29,6 +31,8 @@
 			<oSignal Name="cylClampBottleExtend" Class="com.systemj.ipc.SignalGPIO_1Out" Index="128"/>	<!-- 5 -->
 
 			<oChannel Name="capperReady"     To="RotaryCD.capperReady" />
+			<oChannel Name="capper_detect"     To="RotaryCD.capper_detect" />
+			<iChannel Name="trig_capper"     From="RotaryCD.trig_capper" />
 		</ClockDomain>
 	</SubSystem>
 

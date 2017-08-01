@@ -1,40 +1,51 @@
 Capper(
 		input signal bottleAtPos4, gripperXAxisLowered,gripperXAxisLifted,gripperTurnHomePos,gripperTurnFinalPos;
 		output signal cylPos5XaxisExtend,gripperTurnRetract,gripperTurnExtend,capGripperPos5Extend,cylClampBottleExtend;
-		output boolean channel capperReady;
+		output boolean channel capperReady, capper_detect;
+		input boolean channel trig_capper;
 		)
 ->
 {
-	send capperReady(true);
+	{
+		loop{
+			receive trig_capper;
 
-	loop{
-		await(bottleAtPos4);
-
-		send capperReady(false);
-
-		abort(gripperXAxisLifted){halt;}
-		abort(gripperTurnHomePos){sustain gripperTurnRetract;}
-		trap(T){
-			{sustain cylPos5XaxisExtend;}
-			||
-			{
-				await(gripperXAxisLowered);
-
-				{sustain capGripperPos5Extend;}
-				||	
-				{sustain gripperTurnExtend;}
+			abort(gripperXAxisLifted){halt;}
+			abort(gripperTurnHomePos){sustain gripperTurnRetract;}
+			trap(T){
+				{sustain cylPos5XaxisExtend;}
 				||
 				{
-					await(gripperTurnFinalPos);
-					exit(T);
+					await(gripperXAxisLowered);
+
+					{sustain capGripperPos5Extend;}
+					||	
+					{sustain gripperTurnExtend;}
+					||
+					{
+						await(gripperTurnFinalPos);
+						exit(T);
+					}
 				}
 			}
-		}
-		await(gripperXAxisLifted);
+			await(gripperXAxisLifted);
 
-		send capperReady(true);
-		await(!bottleAtPos4);
-	}	
+			trap(T){{send capperReady(true);} || {waitl(3s); exit(T);}}
+		}	
+	}
+	||
+	{
+		loop {
+			boolean b = false;
+			present(bottleAtPos4){
+				b = true;
+			}
+			send capper_detect(b);
+			waitl(50 ms);
+			pause;
+		}
+	}
+
 
 }
 

@@ -13,19 +13,17 @@
 			<iSignal Name="bottleAtPos1" Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="2" />	<!-- 0 -->			
 			<iSignal Name="bottleLeftPos5"  Class="com.systemj.ipc.SignalGPIO_1In" PinNumber="4" />	<!-- 2 -->			
 			<oSignal Name="motConveyorOnOff" Class="com.systemj.ipc.SignalGPIO_1Out" Index="4"/> <!-- -->	
-			<iChannel Name="rotated"     From="RotaryCD.rotated" />				
 			<oChannel Name="convReady"     To="RotaryCD.convReady" />
-			<oChannel Name="inc"     To="RotaryCD.inc" />
-			<oChannel Name="dec"     To="RotaryCD.dec" />
+			<oChannel Name="conv_detect"     To="RotaryCD.conv_detect" />
+			<iChannel Name="trig_conveyor"     From="RotaryCD.trig_conveyor" />
 		</ClockDomain>	
 	</SubSystem>
 
 	<SubSystem Name="RotarySS">	
 		<ClockDomain Name="RotaryCD" Class="Rotary">
-			<oChannel Name="rotated"     To="ConveyorCD.rotated" />				
 			<iChannel Name="convReady"     From="ConveyorCD.convReady" />
-			<iChannel Name="inc"     From="ConveyorCD.inc" />
-			<iChannel Name="dec"     From="ConveyorCD.dec" />
+			<iChannel Name="conv_detect"     From="ConveyorCD.conv_detect" />
+			<oChannel Name="trig_conveyor"     To="ConveyorCD.trig_conveyor" />
 		</ClockDomain>
 	</SubSystem>
 

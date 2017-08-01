@@ -20,12 +20,16 @@
 			<oSignal Name="dosUnitValveExtend" 	Class="com.systemj.ipc.SignalGPIO_1Out" Index="4"/> <!--  0(output header) -->
 			<oChannel Name="fillerReady"     To="RotaryCD.fillerReady" />
 			<oChannel Name="requestCap"     To="RotaryCD.requestCap" />
+			<oChannel Name="filler_detect"     To="RotaryCD.filler_detect" />
+			<iChannel Name="trig_filler"     From="RotaryCD.trig_filler" />
 		</ClockDomain>	
 	</SubSystem>
 	<SubSystem Name="RotarySS">	
 		<ClockDomain Name="RotaryCD" Class="rotary">
 			<iChannel Name="fillerReady"     From="FillerCD.fillerReady" />
 			<iChannel Name="requestCap"     From="FillerCD.requestCap" />
+			<iChannel Name="filler_detect"     From="FillerCD.filler_detect" />
+			<oChannel Name="trig_filler"     To="FillerCD.trig_filler" />
 		</ClockDomain>
 	</SubSystem>
 </System>

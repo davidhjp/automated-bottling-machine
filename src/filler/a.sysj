@@ -1,44 +1,53 @@
 filler(
 		input signal bottleAtPos2,dosUnitEvac,dosUnitFilled;
 		output signal valveInjectorOnOff, valveInletOnOff, dosUnitValveRetract, dosUnitValveExtend ;
-		output boolean channel fillerReady,requestCap;
+		output boolean channel fillerReady,requestCap,filler_detect;
+		input boolean channel trig_filler;
 		)
 ->
 {
 
-	send fillerReady(true);
+	{
+		loop{
+			receive trig_filler;
 
-	loop{
-		await(bottleAtPos2);
-
-		send fillerReady(false);
-
-		abort(dosUnitFilled){
-			{
-				sustain valveInjectorOnOff;
+			abort(dosUnitFilled){
+				{
+					sustain valveInjectorOnOff;
+				}
+				||
+				{
+					sustain dosUnitValveRetract;
+				}
 			}
-			||
-			{
-				sustain dosUnitValveRetract;
+
+			abort(dosUnitEvac){
+				{
+					sustain valveInletOnOff;
+				}
+				||
+				{
+					sustain dosUnitValveExtend;
+				}
 			}
+
+			// Let the rotary know that a cap neeeds to be placed in the next turn
+			send requestCap(true);
+			pause;
+
+			trap(T){{send fillerReady(true);} || { waitl(3s); exit(T);}}
 		}
-
-		abort(dosUnitEvac){
-			{
-				sustain valveInletOnOff;
+	}
+	||
+	{
+		loop {
+			boolean b = false;
+			present(bottleAtPos2){
+				b = true;
 			}
-			||
-			{
-				sustain dosUnitValveExtend;
-			}
+			send filler_detect(b);
+			waitl(50 ms);
+			pause;
 		}
-
-		// Let the rotary know that a cap neeeds to be placed in the next turn
-		send requestCap(true);
-		pause;
-
-		send fillerReady(true);
-
-		await(!bottleAtPos2);
 	}
 }
