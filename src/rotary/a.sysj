@@ -1,3 +1,13 @@
+reaction turnRotary(double WAIT :input signal bottleAtPos5, input signal tableAlignedWithSensor, output signal rotaryTableTrigger) {
+	present(bottleAtPos5) {
+		waitl(1s);
+		await(!bottleAtPos5);
+	}
+	trap(T){{waitl(100ms); exit(T);} || { sustain rotaryTableTrigger;}}
+	pause;
+	waitl(WAIT s);
+	await(tableAlignedWithSensor);
+}
 rotary(
 		input signal tableAlignedWithSensor, bottleAtPos5, capOnBottleAtPos1,GUITrigger,capped;
 		output signal rotaryTableTrigger;
@@ -9,6 +19,7 @@ rotary(
 ->
 {
 	signal placeCapOK, placeCap;
+	boolean signal needToTurn;
 	{
 		System.out.println("starting");
 		loop{
@@ -39,27 +50,21 @@ rotary(
 				||
 				{
 					present(placeCap) {
-						halt;
+						await(capped);
+						emit needToTurn(true);
+						emit placeCapOK;
+						pause;
 					}
 				}
 
-				if(#filler_detect || #capper_detect || #conv_detect) {
-					present(bottleAtPos5) {
-						waitl(1s);
-						await(!bottleAtPos5);
-					}
-					trap(T){{waitl(100ms); exit(T);} || { sustain rotaryTableTrigger;}}
-
-					waitl(3s);
-
-					await(tableAlignedWithSensor);
-					System.out.println("aligned");
+				if(#filler_detect || #capper_detect || #conv_detect || #needToTurn) {
+					emit needToTurn(false);
+					pause;
+					turnRotary(1.5 : bottleAtPos5, tableAlignedWithSensor, rotaryTableTrigger);
 				}
 				pause;
 			} do {
-				trap(T){{waitl(100ms); exit(T);} || {sustain rotaryTableTrigger;}}
-				pause;
-				waitl(3s);
+					turnRotary(1.5 : bottleAtPos5, tableAlignedWithSensor, rotaryTableTrigger);
 			}
 		}
 	}
@@ -72,7 +77,7 @@ rotary(
 		loop{
 			receive requestCap;
 			System.out.println("requestCap");
-			abort(immediate GUITrigger){sustain placeCap;}
+			abort(immediate placeCapOK){sustain placeCap;}
 			System.out.println("placeCapOK");
 			pause;
 		}

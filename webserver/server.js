@@ -12,12 +12,11 @@ app.get('/', function(req,res){
 	res.sendFile('/pages/index.html')
 })
 
-// var BAXTER_HOST = '192.168.1.124'
-// var BAXTER_PORT = 1010
 var ROTARY_HOST = '192.168.1.103'
-var ROTARY_PORT = 1010
-var client = new net.Socket()
-// var baxter_socket = new net.Socket()
+var TURN_PORT = 1010
+var CAPPED_PORT = 1020
+var client_turn = new net.Socket()
+var capped_client = new net.Socket()
 
 function connect_client(s,PORT,HOST) {
 	s.connect(PORT, HOST, function() {
@@ -25,47 +24,43 @@ function connect_client(s,PORT,HOST) {
 	})
 }
 
-client.on('error', function(m) {
+client_turn.on('error', function(m) {
 	console.log(m.message)
-	setTimeout(connect_client.bind(null,client, ROTARY_PORT, ROTARY_HOST),1000)
+	setTimeout(connect_client.bind(null,client_turn, TURN_PORT, ROTARY_HOST),1000)
 })
-client.on('end', function(){
+client_turn.on('end', function(){
 	console.log('Rotary socket terminated')
-	setTimeout(connect_client.bind(null,client, ROTARY_PORT, ROTARY_HOST),1000)
+	setTimeout(connect_client.bind(null,client_turn, TURN_PORT, ROTARY_HOST),1000)
 })
 
-// baxter_socket.on('error', function(m){
-//   console.log(m.message)
-//   setTimeout(connect_client.bind(null,baxter_socket, BAXTER_PORT, BAXTER_HOST), 1000)
-// })
-// baxter_socket.on('end', function(){
-//   console.log('Baxter socket terminated')
-//   setTimeout(connect_client.bind(null,baxter_socket, BAXTER_PORT, BAXTER_HOST), 1000)
-// })
+capped_client.on('error', function(m){
+	console.log(m.message)
+	setTimeout(connect_client.bind(null,capped_client, CAPPED_PORT, ROTARY_HOST), 1000)
+})
+capped_client.on('end', function(){
+	console.log('Baxter socket terminated')
+	setTimeout(connect_client.bind(null,capped_client, CAPPED_PORT, ROTARY_HOST), 1000)
+})
 
 
-connect_client(client, ROTARY_PORT, ROTARY_HOST)
-// connect_client(baxter_socket, BAXTER_PORT, BAXTER_HOST)
+connect_client(client_turn, TURN_PORT, ROTARY_HOST)
+connect_client(capped_client, CAPPED_PORT, ROTARY_HOST)
 
 app.post('/rotary', function(req,res){
 	if(req.query.action == 'rotate') {
-		client.write('1\n')
+		client_turn.write('1\n')
 		setTimeout(function(){
-			client.write('0\n')
+			client_turn.write('0\n')
+			res.status(200).send()
+		}, 100)
+	} else if(req.query.action == 'capped') {
+		capped_client.write('1\n')
+		setTimeout(function(){
+			capped_client.write('0\n')
 			res.status(200).send()
 		}, 100)
 	}
 })
-
-// app.post('/baxter', function(req,res){
-//   if(req.query.action == 'capped') {
-//     baxter_socket.write('1\n')
-//     setTimeout(function(){
-//       baxter_socket.write('0\n')
-//       res.status(200).send()
-//     }, 100)
-//   }
-// })
 
 app.listen(8080)
 

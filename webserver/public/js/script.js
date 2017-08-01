@@ -5,6 +5,6 @@ $(function (){
 	})
 	$('#capped').on('click', function(e){
 		$(this).blur()
-		$.post('baxter?action=capped')
+		$.post('rotary?action=capped')
 	})
 })
