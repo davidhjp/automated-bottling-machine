@@ -36,9 +36,11 @@ rotary(
 						receive convReady;
 					}
 				}
-				pause;
-				present(placeCap) {
-					halt;
+				||
+				{
+					present(placeCap) {
+						halt;
+					}
 				}
 
 				if(#filler_detect || #capper_detect || #conv_detect) {
