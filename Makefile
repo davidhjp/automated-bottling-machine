@@ -36,10 +36,10 @@ webserver/node_modules:
 
 clean:
 ifeq ($(REMOTE),true)
-	ssh $(CV) "rm -rf $(BASE)"
-	ssh $(F)  "rm -rf $(BASE)"
-	ssh $(R)  "rm -rf $(BASE)"
-	ssh $(CP) "rm -rf $(BASE)"
+	ssh $(CV) "rm -rf $(BASE); killall java"
+	ssh $(F)  "rm -rf $(BASE); killall java"
+	ssh $(R)  "rm -rf $(BASE); killall java"
+	ssh $(CP) "rm -rf $(BASE); killall java"
 endif
 	rm -rf bin
 	find src -type f \( -iname '*.java' -o -iname '*.class' \) -exec rm -rf {} \;
@@ -60,16 +60,20 @@ endif
 
 run:
 ifeq ($(REMOTE),true)
-ifeq ($(OS),Windows_NT)
-	mintty --size=40,10 -p 0,0 -T conveyor -e ssh $(CV) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml; read -p 'done'\"" & disown
-	mintty --size=40,10 -p 400,0 -T filler -e ssh $(F) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml; read -p 'done'\""  & disown
-	mintty --size=40,10 -p 800,0 -T rotary -e ssh $(R) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml; read -p 'done'\""  & disown
-	mintty --size=40,10 -p 0,500 -T capper -e ssh $(CP) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml; read -p 'done'\"" & disown
-#    mintty --size=40,10 -p 400,500 -T baxter -e bash -c "cd $(B_DIR); sysjr a.xml; read -p 'done'"  & disown
+	ssh $(CV) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml\"" > /dev/null 2>&1  & disown   
+	ssh $(F) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml\"" > /dev/null 2>&1  & disown  
+	ssh $(R) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml\"" > /dev/null 2>&1  & disown  
+	ssh $(CP) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml\"" > /dev/null 2>&1  & disown   
 	cd webserver ; make
-else
-	$(error Need to implement deployment method for $(shell uname -s))
-endif
+#  ifeq ($(OS),Windows_NT)
+#    mintty --size=40,10 -p 0,0 -T conveyor -e ssh $(CV) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml; read -p 'done'\"" & disown
+#    mintty --size=40,10 -p 400,0 -T filler -e ssh $(F) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml; read -p 'done'\""  & disown
+#    mintty --size=40,10 -p 800,0 -T rotary -e ssh $(R) -t "bash -l -c \"./start_fpga.sh; cd bs;  killall java; bin/sysjr a.xml; read -p 'done'\""  & disown
+#    mintty --size=40,10 -p 0,500 -T capper -e ssh $(CP) -t "bash -l -c \"./start_fpga.sh; cd bs; killall java; bin/sysjr a.xml; read -p 'done'\"" & disown
+#    cd webserver ; make
+#  else
+#    $(error Need to implement deployment method for $(shell uname -s))
+#  endif
 endif
 
 reset:
