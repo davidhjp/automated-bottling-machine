@@ -36,10 +36,10 @@ webserver/node_modules:
 
 clean:
 ifeq ($(REMOTE),true)
-	ssh $(CV) "rm -rf $(BASE); killall java"
-	ssh $(F)  "rm -rf $(BASE); killall java"
-	ssh $(R)  "rm -rf $(BASE); killall java"
-	ssh $(CP) "rm -rf $(BASE); killall java"
+	ssh $(CV) "rm -rf $(BASE); killall -q java || true"
+	ssh $(F)  "rm -rf $(BASE); killall -q java || true"
+	ssh $(R)  "rm -rf $(BASE); killall -q java || true"
+	ssh $(CP) "rm -rf $(BASE); killall -q java || true"
 endif
 	rm -rf bin
 	find src -type f \( -iname '*.java' -o -iname '*.class' \) -exec rm -rf {} \;
