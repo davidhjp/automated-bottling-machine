@@ -13,14 +13,16 @@ R=root@192.168.1.103
 CP=root@192.168.1.104
 
 BASE=bs
-REMOTE=true
+REMOTE=false
 SYSJ_DIR=systemj
 BIN=$(SYSJ_DIR)/sjdk/bin
 LIB=$(SYSJ_DIR)/sjdk/lib
 TOOLS=$(BIN) $(LIB)
 SJDK_RELEASE=https://github.com/hjparker/systemj-release/releases/download/v2.1-120/sjdk-v2.1-120-g6b0e63e.tgz
 
-all: systemj/sjdk init build_all run
+all: download_tools init_remote build_all run
+
+download_tools: systemj/sjdk webserver/node_modules
 
 systemj/sjdk:
 	-mkdir $(SYSJ_DIR)
@@ -28,6 +30,9 @@ systemj/sjdk:
 	chmod 777 $(BIN)/* $(LIB)/*
 	javac -cp $(LIB)/\* gpio/com/systemj/ipc/*.java
 	cd gpio; jar uvf ../$(LIB)/sjrt*-desktop.jar com/systemj/ipc/*.class
+
+webserver/node_modules:
+	cd webserver ; npm install
 
 clean:
 ifeq ($(REMOTE),true)
@@ -41,7 +46,7 @@ endif
 	rm -rf gpio/com/systemj/ipc/*.class
 	rm -rf GUI/*.class
 
-init:
+init_remote:
 ifeq ($(REMOTE),true)
 	-ssh $(CV) "mkdir $(BASE)"
 	-ssh $(F)  "mkdir $(BASE)"
